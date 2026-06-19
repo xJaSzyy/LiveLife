@@ -1,9 +1,9 @@
 {
   "mainAssemblyName": "LiveLife",
   "resources": {
-    "hash": "sha256-g+CvOmctsM1u9oB6404ly18emrb1NnHli2rfI9jmvio=",
+    "hash": "sha256-qVOQKavSW7sLl3abnJTnwWzTwV8uTvZ9/1YAPr50X4k=",
     "fingerprinting": {
-      "LiveLife.if35jyos92.wasm": "LiveLife.wasm",
+      "LiveLife.303p5f5iq8.wasm": "LiveLife.wasm",
       "Microsoft.AspNetCore.Components.u93sesymwe.wasm": "Microsoft.AspNetCore.Components.wasm",
       "Microsoft.AspNetCore.Components.Web.uwaqp4l8rc.wasm": "Microsoft.AspNetCore.Components.Web.wasm",
       "Microsoft.AspNetCore.Components.WebAssembly.t46dtvouik.wasm": "Microsoft.AspNetCore.Components.WebAssembly.wasm",
@@ -62,7 +62,7 @@
       "System.Runtime.InteropServices.JavaScript.h48ngg49jo.wasm": "sha256-4ViELjYjmHFXeufjSKi9w6LE2MIOfmii3tm+YdyLbvc="
     },
     "assembly": {
-      "LiveLife.if35jyos92.wasm": "sha256-ntvdSm0Wwvp2u6hKty76rVpjKfA+m+CtvOgsxV02yC4=",
+      "LiveLife.303p5f5iq8.wasm": "sha256-jZNIPek1nSuNIcS47o1ZIxgASTqXTjK0eCKqgLEVXZQ=",
       "Microsoft.AspNetCore.Components.u93sesymwe.wasm": "sha256-kl32CrMofw4wfpl7qUyXeDqP62D4bYhLYJ62o4sEvA0=",
       "Microsoft.AspNetCore.Components.Web.uwaqp4l8rc.wasm": "sha256-Qq1IJnKRIo6iG5XeJWbYYZs0ivBcWuwMH14e90zNaE0=",
       "Microsoft.AspNetCore.Components.WebAssembly.t46dtvouik.wasm": "sha256-TXmB8No/nflxVQ0acHt/vIixt2s+nUdBW4goU9mnMn4=",
