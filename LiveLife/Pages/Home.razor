@@ -1,0 +1,96 @@
+﻿@page "/"
+@using LiveLife.Models
+@inject IJSRuntime Js
+
+<canvas id="worldCanvas"
+        width="1024"
+        height="1024"
+        @onmousedown="OnMouseDown"
+        @onmousemove="OnMouseMove"
+        @onmouseup="OnMouseUp"
+        @onmouseleave="OnMouseUp">
+</canvas>
+
+<div class="toolbar">
+    @foreach (var type in Enum.GetValues<PixelType>())
+    {
+        <button class="@GetClass(type)"
+                @onclick="() => _currentPixelType = type">
+            @type
+        </button>
+    }
+</div>
+
+@code {
+    private const int GridSize = 64;
+    private const int PixelSize = 16;
+
+    private bool _isMouseDown;
+
+    private readonly List<Pixel> _world = [];
+    private PixelType _currentPixelType = PixelType.Stone;
+
+    protected override void OnInitialized()
+    {
+        GenerateWorld();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeVoidAsync("canvasService.init", "worldCanvas", GridSize, PixelSize);
+            await Js.InvokeVoidAsync("canvasService.setWorld", _world);
+            await Js.InvokeVoidAsync("canvasService.startLoop", DotNetObjectReference.Create(this));
+        }
+    }
+
+    private async Task OnMouseDown(MouseEventArgs e)
+    {
+        _isMouseDown = true;
+        await Paint(e);
+    }
+
+    private async Task OnMouseMove(MouseEventArgs e)
+    {
+        if (!_isMouseDown)
+        {
+            return;
+        }
+
+        await Paint(e);
+    }
+
+    private void OnMouseUp(MouseEventArgs e)
+    {
+        _isMouseDown = false;
+    }
+
+    private async Task Paint(MouseEventArgs e)
+    {
+        var x = (int)(e.OffsetX / PixelSize);
+        var y = (int)(e.OffsetY / PixelSize);
+
+        await Js.InvokeVoidAsync("canvasService.paint", x, y, (int)_currentPixelType);
+    }
+
+    private string GetClass(PixelType type)
+    {
+        return type == _currentPixelType ? "active" : "";
+    }
+    
+    private void GenerateWorld()
+    {
+        for (var i = 0; i < GridSize * GridSize; i++)
+        {
+            _world.Add(new Pixel
+            {
+                X = i % GridSize,
+                Y = i / GridSize,
+                Type = PixelType.Empty
+            });
+        }
+
+        _world[4].Type = PixelType.Water;
+    }
+}
