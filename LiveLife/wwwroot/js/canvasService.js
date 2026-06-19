@@ -85,20 +85,20 @@ window.canvasService = {
         return;
       }
 
-      const inBounds = (idx) => idx >= 0 && idx < world.length;
-
+      const left = y * size + (x - 1);
       const downLeft = (y + 1) * size + (x - 1);
+      const right = y * size + (x + 1);
       const downRight = (y + 1) * size + (x + 1);
 
       const canDownLeft =
         x > 0 &&
-        inBounds(downLeft) &&
-        this.isEmpty(world, downLeft);
+        this.isEmpty(world, downLeft) &&
+        this.isEmpty(world, left);
 
       const canDownRight =
         x < size - 1 &&
-        inBounds(downRight) &&
-        this.isEmpty(world, downRight);
+        this.isEmpty(world, downRight) &&
+        this.isEmpty(world, right);
 
       if (canDownLeft && canDownRight) {
         const dir = Math.random() < 0.5 ? downLeft : downRight;
@@ -107,16 +107,13 @@ window.canvasService = {
         return;
       }
 
-      const leftBlocked = x > 0 && !this.isEmpty(world, i - 1);
-      const rightBlocked = x < size - 1 && !this.isEmpty(world, i + 1);
-
-      if (canDownLeft && !leftBlocked) {
+      if (canDownLeft && this.isEmpty(world, left)) {
         world[downLeft].type = 3;
         world[i].type = 0;
         return;
       }
 
-      if (canDownRight && !rightBlocked) {
+      if (canDownRight && this.isEmpty(world, right)) {
         world[downRight].type = 3;
         world[i].type = 0;
       }
