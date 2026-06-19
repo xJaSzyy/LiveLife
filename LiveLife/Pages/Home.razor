@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using LiveLife.Models
+@using LiveLife.Services
 @inject IJSRuntime Js
 
 <canvas id="worldCanvas"
@@ -21,18 +22,47 @@
     }
 </div>
 
+<div class="toolbar">
+    @foreach (var level in _levels)
+    {
+        <button class="@GetClass(level)"
+                @onclick="() => SetLevel(level)">
+            @level
+        </button>
+    }
+</div>
+
+@if (_isLevelCompleted)
+{
+    <div class="level-overlay">
+        <div class="level-modal">
+            <h1>Уровень @_currentLevel пройден!</h1>
+
+            <button @onclick="CloseLevelCompleted">
+                Продолжить
+            </button>
+        </div>
+    </div>
+}
+
 @code {
     private const int GridSize = 64;
     private const int PixelSize = 16;
+    private readonly int[] _levels = [1, 2, 3, 4];
 
     private bool _isMouseDown;
 
-    private readonly List<Pixel> _world = [];
+    private List<Pixel> _world = [];
     private PixelType _currentPixelType = PixelType.Stone;
+    private int _currentLevel = 1;
+    private bool _isLevelCompleted;
+    
+    private readonly LevelLoaderService _levelLoaderService = new(GridSize);
+
 
     protected override void OnInitialized()
     {
-        GenerateWorld();
+        _ = SetLevel(_currentLevel);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -40,11 +70,12 @@
         if (firstRender)
         {
             await Js.InvokeVoidAsync("canvasService.init", "worldCanvas", GridSize, PixelSize);
-            await Js.InvokeVoidAsync("canvasService.setWorld", _world);
             await Js.InvokeVoidAsync("canvasService.startLoop", DotNetObjectReference.Create(this));
         }
     }
 
+    #region MouseEvents
+    
     private async Task OnMouseDown(MouseEventArgs e)
     {
         _isMouseDown = true;
@@ -65,6 +96,8 @@
     {
         _isMouseDown = false;
     }
+    
+    #endregion
 
     private async Task Paint(MouseEventArgs e)
     {
@@ -79,18 +112,26 @@
         return type == _currentPixelType ? "active" : "";
     }
     
-    private void GenerateWorld()
+    private string GetClass(int level)
     {
-        for (var i = 0; i < GridSize * GridSize; i++)
-        {
-            _world.Add(new Pixel
-            {
-                X = i % GridSize,
-                Y = i / GridSize,
-                Type = PixelType.Empty
-            });
-        }
+        return level == _currentLevel ? "active" : "";
+    }
+    
 
-        _world[4].Type = PixelType.Water;
+    private async Task SetLevel(int level)
+    {
+        _currentLevel = level;
+        _world = _levelLoaderService.GenerateWorldByLevel(_currentLevel);
+        await Js.InvokeVoidAsync("canvasService.setWorld", _world);
+    }
+    
+    public void ShowLevelCompleted()
+    {
+        _isLevelCompleted = true;
+    }
+
+    private void CloseLevelCompleted()
+    {
+        _isLevelCompleted = false;
     }
 }

@@ -131,3 +131,42 @@ button.active {
     background: deepskyblue;
     color: black;
 }
+
+.level-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    z-index: 1000;
+}
+
+.level-modal {
+    min-width: 400px;
+
+    padding: 32px;
+
+    border-radius: 16px;
+
+    background: white;
+
+    text-align: center;
+
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.level-modal h1 {
+    margin-top: 0;
+}
+
+.level-modal button {
+    margin-top: 20px;
+
+    padding: 12px 24px;
+
+    cursor: pointer;
+}
