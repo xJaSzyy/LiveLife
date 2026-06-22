@@ -15,12 +15,15 @@ window.canvasService = {
 
     setWorld: function(world) {
       this.world = world;
+      console.log(this.world);
     },
 
     startLoop: function () {
       const loop = () => {
-        this.updateWorld(this.world);
-        this.drawWorld(this.world);
+        if (this.world != null) {
+          this.updateWorld(this.world);
+          this.drawWorld(this.world);
+        }
   
         requestAnimationFrame(loop);
       };
@@ -140,5 +143,26 @@ window.canvasService = {
   
         this.ctx.fillRect(x * ps, y * ps, ps, ps);
       }
-    }
+    },
+
+    exportWorld: function () {
+      if (!this.world) return null;
+  
+      const data = {
+        size: this.gridSize,
+        pixels: this.world.map(c => c.type)
+      };
+  
+      return JSON.stringify(data);
+    },
+
+    importWorld: function (json) {
+      const data = JSON.parse(json);
+  
+      this.gridSize = data.size;
+  
+      this.world = data.pixels.map(t => ({
+        type: t
+      }));
+    },
 };

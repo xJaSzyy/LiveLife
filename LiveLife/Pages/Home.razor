@@ -1,7 +1,9 @@
 ﻿@page "/"
+@using System.Text.Json
 @using LiveLife.Models
 @using LiveLife.Services
 @inject IJSRuntime Js
+@inject HttpClient Http
 
 <canvas id="worldCanvas"
         width="1024"
@@ -32,6 +34,8 @@
     }
 </div>
 
+<button @onclick="() => ExportLevel()">Export</button>
+
 @if (_isLevelCompleted)
 {
     <div class="level-overlay">
@@ -56,12 +60,14 @@
     private PixelType _currentPixelType = PixelType.Stone;
     private int _currentLevel = 1;
     private bool _isLevelCompleted;
-    
-    private readonly LevelLoaderService _levelLoaderService = new(GridSize);
+
+    private LevelLoaderService _levelLoaderService = null!;
 
 
     protected override void OnInitialized()
     {
+        _levelLoaderService = new LevelLoaderService(Http, GridSize);
+        
         _ = SetLevel(_currentLevel);
     }
 
@@ -117,11 +123,10 @@
         return level == _currentLevel ? "active" : "";
     }
     
-
     private async Task SetLevel(int level)
     {
         _currentLevel = level;
-        _world = _levelLoaderService.GenerateWorldByLevel(_currentLevel);
+        _world = await _levelLoaderService.GenerateWorldByLevel(_currentLevel);
         await Js.InvokeVoidAsync("canvasService.setWorld", _world);
     }
     
@@ -133,5 +138,11 @@
     private void CloseLevelCompleted()
     {
         _isLevelCompleted = false;
+    }
+
+    private async Task ExportLevel()
+    {
+        var json = await Js.InvokeAsync<string>("canvasService.exportWorld");
+        Console.WriteLine(json);
     }
 }

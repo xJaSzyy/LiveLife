@@ -1,58 +1,69 @@
+using System.Text.Json;
 using LiveLife.Models;
 
 namespace LiveLife.Services;
 
-public class LevelLoaderService(int gridSize)
+public class LevelLoaderService(HttpClient http, int gridSize)
 {
-    private readonly List<Pixel> _world = [];
-    
-    public List<Pixel> GenerateWorldByLevel(int level)
+    public async Task<List<Pixel>> GenerateWorldByLevel(int level)
     {
-        switch (level)
+        var world = await GenerateLevel(level);
+
+        return world ?? GetEmptyWorld();
+    }
+
+    private async Task<List<Pixel>?> GenerateLevel(int level)
+    {
+        return await LoadLevel("level" + level);
+    }
+    
+    private async Task<List<Pixel>?> LoadLevel(string name)
+    {
+        var world = new List<Pixel>();
+
+        try
         {
-            case 1:
-                GenerateLevel1();
-                break;
-            case 2:
-                GenerateLevel2();
-                break;
-            default:
-                ClearWorld();
-                break;
+            var json = await http.GetStringAsync($"levels/{name}.json");
+
+            var level = JsonSerializer.Deserialize<LevelData>(json);
+
+            if (level == null)
+            {
+                return null;
+            }
+
+            for (var i = 0; i < level.Pixels.Length; i++)
+            {
+                world.Add(new Pixel
+                {
+                    X = i % gridSize,
+                    Y = i / gridSize,
+                    Type = level.Pixels[i]
+                });
+            }
+
+            return world;
         }
-
-        return _world;
-    }
-
-    private void GenerateLevel1()
-    {
-        ClearWorld();
-
-        _world[244].Type = PixelType.Water;
+        catch
+        {
+            return null;
+        }
     }
     
-    private void GenerateLevel2()
+    private List<Pixel> GetEmptyWorld()
     {
-        ClearWorld();
-
-        _world[129].Type = PixelType.Stone;
-        _world[130].Type = PixelType.Stone;
-        _world[131].Type = PixelType.Stone;
-        _world[132].Type = PixelType.Stone;
-    }
-
-    private void ClearWorld()
-    {
-        _world.Clear();
+        var world = new List<Pixel>();
         
         for (var i = 0; i < gridSize * gridSize; i++)
         {
-            _world.Add(new Pixel
+            world.Add(new Pixel
             {
                 X = i % gridSize,
                 Y = i / gridSize,
                 Type = PixelType.Empty
             });
         }
+
+        return world;
     }
 }
