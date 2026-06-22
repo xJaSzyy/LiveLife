@@ -1,5 +1,5 @@
 ﻿@page "/"
-@using System.Text.Json
+@using System.Drawing
 @using LiveLife.Models
 @using LiveLife.Services
 @inject IJSRuntime Js
@@ -34,7 +34,7 @@
     }
 </div>
 
-<button @onclick="() => ExportLevel()">Export</button>
+<button @onclick="ExportLevel">Export</button>
 
 @if (_isLevelCompleted)
 {
@@ -110,7 +110,9 @@
         var x = (int)(e.OffsetX / PixelSize);
         var y = (int)(e.OffsetY / PixelSize);
 
-        await Js.InvokeVoidAsync("canvasService.paint", x, y, (int)_currentPixelType);
+        var component = _currentPixelType == PixelType.Sand ? new SandComponent() : null;
+        
+        await Js.InvokeVoidAsync("canvasService.paint", x, y, (int)_currentPixelType, component);
     }
 
     private string GetClass(PixelType type)
