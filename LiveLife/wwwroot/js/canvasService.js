@@ -99,6 +99,11 @@ window.canvasService = {
 
       if (target === 4) {
         world[down].type = 4;
+        world[down].component.humidity += 1;
+        if (world[down].component.humidity >= 1) {
+          world[down].type = 5;
+        }
+        
         world[i].type = 0;
         return;
       }
@@ -123,6 +128,11 @@ window.canvasService = {
 
       if (target === 4) {
         world[ni].type = 4;
+        world[ni].component.humidity += 1;
+        if (world[ni].component.humidity >= 1) {
+          world[ni].type = 5;
+        }
+        
         world[i].type = 0;
         return;
       }
@@ -164,6 +174,7 @@ window.canvasService = {
       if (target === 3) {
         world[down].type = 4;
         world[down].component = world[i].component;
+        
         world[i].type = 0;
         world[i].component = null;
         return;
@@ -192,6 +203,7 @@ window.canvasService = {
       if (target === 3) {
         world[ni].type = 4;
         world[ni].component = world[i].component;
+        
         world[i].type = 0;
         world[i].component = null;
         return;
@@ -218,6 +230,7 @@ window.canvasService = {
       if (cell.type === 2) this.ctx.fillStyle = "seagreen";
       if (cell.type === 3) this.ctx.fillStyle = "cornflowerblue";
       if (cell.type === 4) this.ctx.fillStyle = "sandybrown";
+      if (cell.type === 5) this.ctx.fillStyle = "peru";
 
       this.ctx.fillRect(x * ps, y * ps, ps, ps);
     }

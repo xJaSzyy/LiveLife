@@ -24,7 +24,7 @@ public class LevelLoaderService(HttpClient http, int gridSize)
         try
         {
             var json = await http.GetStringAsync($"levels/{name}.json");
-
+            
             var level = JsonSerializer.Deserialize<LevelData>(json);
 
             if (level == null)
@@ -32,13 +32,14 @@ public class LevelLoaderService(HttpClient http, int gridSize)
                 return null;
             }
 
-            for (var i = 0; i < level.Pixels.Length; i++)
+            for (var i = 0; i < level.Pixels.Count; i++)
             {
                 world.Add(new Pixel
                 {
                     X = i % gridSize,
                     Y = i / gridSize,
-                    Type = level.Pixels[i]
+                    Type = level.Pixels[i].Type,
+                    Component = level.Pixels[i].Component
                 });
             }
 
