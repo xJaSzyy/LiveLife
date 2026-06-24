@@ -5,13 +5,16 @@
 @inject IJSRuntime Js
 @inject HttpClient Http
 
+<div>Brush size: @_brushSize</div>
+
 <canvas id="worldCanvas"
         width="1024"
         height="1024"
         @onmousedown="OnMouseDown"
         @onmousemove="OnMouseMove"
         @onmouseup="OnMouseUp"
-        @onmouseleave="OnMouseUp">
+        @onmouseleave="OnMouseUp"
+        @onwheel="OnMouseWheel">
 </canvas>
 
 <div class="toolbar">
@@ -61,6 +64,8 @@
     private int _currentLevel = 1;
     private bool _isLevelCompleted;
 
+    private int _brushSize = 1;
+
     private LevelLoaderService _levelLoaderService = null!;
 
 
@@ -102,17 +107,35 @@
     {
         _isMouseDown = false;
     }
+
+    private void OnMouseWheel(WheelEventArgs e)
+    {
+        if (e.DeltaY < 0)
+        {
+            _brushSize++;
+        }
+        else if (e.DeltaY > 0)
+        {
+            _brushSize--;
+        }
+    }
     
     #endregion
 
     private async Task Paint(MouseEventArgs e)
     {
-        var x = (int)(e.OffsetX / PixelSize);
-        var y = (int)(e.OffsetY / PixelSize);
+        for (var i = 0; i < _brushSize; i++)
+        {
+            for (var j = 0; j < _brushSize; j++)
+            {
+                var x = (int)(e.OffsetX / PixelSize) + i;
+                var y = (int)(e.OffsetY / PixelSize) + j;
 
-        var component = _currentPixelType == PixelType.Sand ? new SandComponent() : null;
+                var component = _currentPixelType == PixelType.Sand ? new SandComponent() : null;
         
-        await Js.InvokeVoidAsync("canvasService.paint", x, y, (int)_currentPixelType, component);
+                await Js.InvokeVoidAsync("canvasService.paint", x, y, (int)_currentPixelType, component);
+            }
+        }
     }
 
     private string GetClass(PixelType type)
